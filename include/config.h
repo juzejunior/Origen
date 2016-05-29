@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #include<time.h>
 #include<ctype.h>
 #include<stdlib.h>
@@ -18,3 +21,6 @@ void limparTela();
 int checkSO();
 void limparTela();
 char* now();
+char *encrypt(char *senha);
+
+#endif

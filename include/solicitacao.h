@@ -1,3 +1,6 @@
+#ifndef SOLICITACAO_H
+#define SOLICITACAO_H
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -26,3 +29,5 @@ int pedido_id();
 void exibirNaoAtendidas();
 /*ordena*/
 void insertSortAno(Solicitacao *s, int n);
+
+#endif

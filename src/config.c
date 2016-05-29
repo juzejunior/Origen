@@ -1,3 +1,4 @@
+#include "../include/config.h"
 
 
 void converte_maisculo(char *palavra)
@@ -7,6 +8,18 @@ void converte_maisculo(char *palavra)
 		*palavra = toupper(*palavra);
 		palavra++;
 	}		
+}
+
+/*utilizada para encriptar a senha do usuario*/
+char *encrypt(char *senha)
+{
+	while(*senha)
+	{
+		*senha = *senha ^ 31;
+		senha++;
+	}
+	
+	return senha;
 }
 
 int checkSO()
@@ -26,12 +39,14 @@ void limparTela()
 	else system ("cls");
 	return;
 }
-/*Retorna data e hora atual*/
+///Retorna data e hora atual
 char* now()
 {
 	time_t t;
 	time(&t);
 	return asctime(localtime(&t));
 }
+
+
 
 
