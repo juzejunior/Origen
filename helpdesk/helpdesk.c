@@ -33,12 +33,7 @@ void exibirNaoAtendidas()
 	int opcao;
 	FILE *file = fopen("../database/solicitacao.bin","rb");
 	Solicitacao s;
-	Solicitacao *v;
-	int n = 5;
 	int i = 0;
-    int k = 0;
-	//iniciando o vetor com 5 espaços
-	v = (Solicitacao*) malloc(n*sizeof(Solicitacao));
 	
 	limparTela();
 	printf("\n             Origen - HelpDesk          %s\n\n", now());
@@ -47,25 +42,18 @@ void exibirNaoAtendidas()
 	if(file != NULL)
 	{
 		while(fread(&s,sizeof(Solicitacao),1, file) == 1) {
-			if(s.situacao == 'A')
+			if(s.situacao == 'A' && i < 10)
 			{
-				//realoca a cada 5 espaços
-				if(i % n == 0 && i != 0) v = (Solicitacao*) realloc(v,i+n *(sizeof(Solicitacao)));
-				v[i] = s;
+				printf(" Empresa: %s              Em: %d/%d/%d\n",  s.nomeEmpresa, s.data.dia, s.data.mes, s.data.ano);	
+				printf(" Setor: %s\n", s.setorEmpresa);
+				printf(" Solicitante: %s\n", s.nomeSolicitante);
+				printf(" Contato: %s\n", s.contato);
+				printf(" Email: %s\n", s.email);
+				printf(" Cod: %d       Situação: %c\n", s.id, s.situacao);
+				printf(" Problema: %s\n\n", s.problema);
+				printf(" ------------------------------------------------\n\n");	
 				i++;
 			}
-		}
-		/*exibindo do maior para o menor*/
-		for(k = i-1; k >= 0; k--)
-		{
-			printf(" Empresa: %s              Em: %d/%d/%d\n",  v[k].nomeEmpresa,v[k].data.dia, v[k].data.mes, v[k].data.ano);	
-			printf(" Setor: %s\n", v[k].setorEmpresa);
-			printf(" Solicitante: %s\n", v[k].nomeSolicitante);
-			printf(" Contato: %s\n", v[k].contato);
-			printf(" Email: %s\n", v[k].email);
-			printf(" Cod: %d       Situação: %c\n", v[k].id, v[k].situacao);
-			printf(" Problema: %s\n\n",v[k].problema);
-			printf(" ------------------------------------------------\n\n");
 		}
 		//se nao houver novas solicitacoes
 		if(i == 0)
