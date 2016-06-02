@@ -4,13 +4,15 @@
 void menuClient()
 {
 	int opcao;
-	limparTela();
-	printf("\n             Origen - Empresas         %s\n\n", now());
-	printf(" 1 - Nova solicitação | 2 - Solicitações em andamento | 3 - Solicitações resolvidas | 4 - Sair\n\n");
-	printf(" Opção: ");
-	scanf("%d", &opcao);
-	switch(opcao)
-	{
+	
+	do{
+	  limparTela();
+	  printf("\n             Origen - Empresas         %s\n\n", now());
+	  printf(" 1 - Nova solicitação | 2 - Solicitações em andamento | 3 - Solicitações resolvidas | 4 - Sair\n\n");
+	  printf(" Opção: ");
+	  scanf("%d", &opcao);
+	  switch(opcao)
+	  {
 		case 1:
 			formulario();
 		break;
@@ -24,8 +26,8 @@ void menuClient()
 			limparTela();
 			printf(" Volte sempre ;)\n");
 		break;
-	}
-	
+	  }	
+    } while(opcao < 1 || opcao > 4);
 }
 
 void formulario()
@@ -84,8 +86,15 @@ int pedido_id()
 	Solicitacao s;
 	int contador = 0;
 	
-	while(fread(&s,sizeof(Solicitacao),1, file) == 1) contador++;
+	if(fread(&s, sizeof(Solicitacao),1, file) == 1)
+	{
+		 //se houver arquivos
+		 fseek(file,sizeof(Solicitacao), SEEK_END);
+		 fread(&s,sizeof(Solicitacao),1,file);
+		 return contador = s.id;
+	}
 	
+	fclose(file);
 	return contador;
 }
 
@@ -113,6 +122,7 @@ void solicitacoesAndamento()
 				printf(" Empresa: %s              Em: %d/%d/%d\n",  s.nomeEmpresa,s.data.dia, s.data.mes, s.data.ano);	
 				printf(" Setor: %s\n", s.setorEmpresa);
 				printf(" Solicitante: %s\n", s.nomeSolicitante);
+				printf(" Funcionário: %d\n", s.codigo_funcionario);
 				switch(s.situacao)
 				{
 					case 'A': 	printf(" Cod: %d       Situação: Aguardando atendimento\n", s.id);

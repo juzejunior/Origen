@@ -25,7 +25,7 @@ void menuHelpDesk()
 				printf(" Volte sempre!\n");
 			break;
 		}
-	}while(opcao != 1 && opcao != 2 && opcao != 3);
+	}while(opcao < 1 || opcao > 3);
 }
 
 void exibirNaoAtendidas()
