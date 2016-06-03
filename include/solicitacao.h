@@ -27,7 +27,5 @@ void formulario();
 int pedido_id();
 /*exibe ordenado por data as solicitações não atendidas*/
 void exibirNaoAtendidas();
-/*ordena*/
-void insertSortAno(Solicitacao *s, int n);
 
 #endif

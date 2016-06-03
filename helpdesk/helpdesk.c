@@ -9,7 +9,7 @@ void menuHelpDesk()
 	do{
 	  limparTela();
 		printf("\n             Origen - HelpDesk          %s\n\n", now());
-		printf(" 1 - Solicitações não atendidas | 2 - Em andamento | 3 - Sair\n\n");
+		printf(" 1 - Não atendidas | 2 - Em andamento | 3 - Transferir | 4 - Sair\n\n");
 		printf(" Opção: ");
 		scanf("%d", &opcao);
 		switch(opcao)
@@ -21,11 +21,14 @@ void menuHelpDesk()
 				atendimentosPendentes();
 			break;
 			case 3:
+				trocarSolicitacao();
+			break;
+			case 4:
 				limparTela();
 				printf(" Volte sempre!\n");
 			break;
 		}
-	}while(opcao < 1 || opcao > 3);
+	}while(opcao < 1 || opcao > 4);
 }
 
 void exibirNaoAtendidas()
@@ -244,5 +247,47 @@ void exibirSolucionadas()
 			printf(" ------------------------------------------------\n\n");		
 		}
 	}
+}
+
+/*trocar solicitacao entre helpdesks*/
+void trocarSolicitacao()
+{
+	FILE *file = fopen("../database/solicitacao.bin","rb+");
+	Solicitacao s;
+	int opcao, id_atual, id_proximo, cod_solicitacao;
+	
+	if(file != NULL)
+	{
+		limparTela(); 
+		printf("\n             Origen - HelpDesk          %s\n\n", now());
+		printf(" Informe o seu código de helpdesk: ");
+		scanf("%d", &id_atual);
+		printf(" Informe o código da solicitação: ");
+		scanf("%d", &cod_solicitacao);
+		
+		if(fseek(file, sizeof(Solicitacao)*(cod_solicitacao-1), SEEK_SET) == 0)
+		{
+			fread(&s,sizeof(Solicitacao),1, file);
+			if(s.id == cod_solicitacao && s.situacao == 'E' && s.codigo_funcionario == id_atual)
+			{
+				fseek(file, sizeof(Solicitacao)*(cod_solicitacao-1), SEEK_SET);
+				printf(" Informe o código do novo encarregado: ");
+				scanf("%d", &id_proximo);
+				s.codigo_funcionario = id_proximo;
+				printf(" Transferência realizada com sucesso :)\n\n");
+				fwrite(&s,sizeof(Solicitacao),1,file);
+			}else{
+				printf(" Esta solicitação está em nome de outro helpdesk ou já foi finalizada.\n\n");
+			}
+		}else{
+			printf(" Solicitação inexistente :(\n\n");
+		}
+		fclose(file);	
+	}else{
+		printf(" Arquivo não encontrado. Entre em contato com os administradores do sistema :)\n");
+	}
+	printf(" 1-Voltar\n\n Opção: ");
+	scanf("%d", &opcao);
+	menuHelpDesk();
 }
 

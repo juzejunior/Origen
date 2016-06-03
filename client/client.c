@@ -8,7 +8,7 @@ void menuClient()
 	do{
 	  limparTela();
 	  printf("\n             Origen - Empresas         %s\n\n", now());
-	  printf(" 1 - Nova solicitação | 2 - Solicitações em andamento | 3 - Solicitações resolvidas | 4 - Sair\n\n");
+	  printf(" 1-Nova solicitação | 2-Solicitações em andamento | 3-Finalizadas | 4-Sair\n\n");
 	  printf(" Opção: ");
 	  scanf("%d", &opcao);
 	  switch(opcao)
