@@ -24,7 +24,7 @@ void menuClient()
 		break;
 		case 4:
 			limparTela();
-			printf(" Volte sempre ;)\n");
+			printf(" Até logo ;)\n");
 		break;
 	  }	
     } while(opcao < 1 || opcao > 4);
@@ -32,48 +32,57 @@ void menuClient()
 
 void formulario()
 {
-	time_t t = time(NULL);//uteis para datas e hora
+	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 	Solicitacao s;
 	char opcao;
 	FILE *file = fopen("../database/solicitacao.bin","ab");
 	limparTela();
-	
+
+	printf("\n             Origen - Empresas         %s\n\n", now());
+
 	if(file != NULL)
 	{
-		do{
-		  file = fopen("../database/solicitacao.bin","ab");	
-		  printf("\n             Origen - Empresas         %s\n\n", now());
-		  printf(" Empresa: ");
-		  scanf(" %[^\n]s", s.nomeEmpresa);
-		  converte_maisculo(s.nomeEmpresa);
-		  printf(" Setor: ");
-		  scanf(" %[^\n]s", s.setorEmpresa);
-		  printf(" Solicitante: ");
-		  scanf(" %[^\n]s", s.nomeSolicitante);
-		  printf(" Contato: ");
-		  scanf(" %[^\n]s", s.contato);
-		  printf(" E-mail: ");
-		  scanf(" %[^\n]s", s.email);
-		  printf(" Informe o problema: ");
-		  scanf(" %[^\n]s", s.problema);
-		  strcpy(s.solucao," Aguardando atendimento!");
-		  s.situacao = 'A';
-		  s.data.ano = tm.tm_year + 1900;
-		  s.data.mes = tm.tm_mon + 1;
-		  s.data.dia = tm.tm_mday;
-		  s.data.hora = tm.tm_hour;
-		  s.data.minuto = tm.tm_min;
-		  s.data.segundos = tm.tm_sec;
-		  s.id = pedido_id()+1;
-		  //gravando solicitacao
-		  if(fwrite(&s,sizeof(Solicitacao),1, file) != 0) printf(" Solicitação realizada com sucesso!\n\n");
-		  else printf(" Não foi possível enviar a solicitação!\n\n");
-		
-		  printf(" Nova solicitação? (s/n): ");
-		  scanf(" %c", &opcao);
-		  fclose(file);	
-		}while(opcao != 'n');	
+		if(criarBloqueio()){
+			do{
+				file = fopen("../database/solicitacao.bin","ab");	
+				printf("\n             Origen - Empresas         %s\n\n", now());
+				printf(" Empresa: ");
+				scanf(" %[^\n]s", s.nomeEmpresa);
+				converte_maisculo(s.nomeEmpresa);
+				printf(" Setor: ");
+				scanf(" %[^\n]s", s.setorEmpresa);
+				printf(" Solicitante: ");
+				scanf(" %[^\n]s", s.nomeSolicitante);
+				printf(" Contato: ");
+				scanf(" %[^\n]s", s.contato);
+				printf(" E-mail: ");
+				scanf(" %[^\n]s", s.email);
+				printf(" Informe o problema: ");
+				scanf(" %[^\n]s", s.problema);
+				strcpy(s.solucao," Aguardando atendimento!");
+				s.situacao = 'A';
+				s.data.ano = tm.tm_year + 1900;
+				s.data.mes = tm.tm_mon + 1;
+				s.data.dia = tm.tm_mday;
+				s.data.hora = tm.tm_hour;
+				s.data.minuto = tm.tm_min;
+				s.data.segundos = tm.tm_sec;
+				s.id = pedido_id()+1;
+				//gravando solicitacao
+				if(fwrite(&s,sizeof(Solicitacao),1, file) != 0) printf(" Solicitação realizada com sucesso!\n\n");
+				else printf(" Não foi possível enviar a solicitação!\n\n");
+				printf(" Nova solicitação? (s/n): ");
+				scanf(" %c", &opcao);
+				fclose(file);	
+			}while(opcao != 'n');
+
+			removerBloqueio();
+		}else{
+			printf(" Arquivo em uso no momento. Aguarde 1 minuto :)\n\n");
+			fclose(file);
+		}
+		pause();	
 		menuClient();
 	}else{
 		printf(" Arquivo não encontrado :(\n\n");
@@ -111,33 +120,37 @@ void solicitacoesAndamento()
 	
 	if(file != NULL)
 	{
-		printf(" Empresa: ");
-		scanf(" %[^\n]s", nomeEmpresa);	
-		converte_maisculo(nomeEmpresa);
-		printf("\n");
-		while(fread(&s,sizeof(Solicitacao),1, file) == 1)
-		{
-			if(strcmp(s.nomeEmpresa, nomeEmpresa) == 0 && (s.situacao == 'E' || s.situacao == 'A'))
+		if(criarBloqueio()){
+			printf(" Empresa: ");
+			scanf(" %[^\n]s", nomeEmpresa);	
+			converte_maisculo(nomeEmpresa);
+			printf("\n");
+			while(fread(&s,sizeof(Solicitacao),1, file) == 1)
 			{
-				printf(" Empresa: %s              Em: %d/%d/%d\n",  s.nomeEmpresa,s.data.dia, s.data.mes, s.data.ano);	
-				printf(" Setor: %s\n", s.setorEmpresa);
-				printf(" Solicitante: %s\n", s.nomeSolicitante);
-				printf(" Funcionário: %d\n", s.codigo_funcionario);
-				switch(s.situacao)
+				if(strcmp(s.nomeEmpresa, nomeEmpresa) == 0 && (s.situacao == 'E' || s.situacao == 'A'))
 				{
-					case 'A': 	printf(" Cod: %d       Situação: Aguardando atendimento\n", s.id);
-					break;
-					case 'E': printf(" Cod: %d       Situação: Em atendimento\n", s.id);
-					break;
-				}
+					printf(" Empresa: %s              Em: %d/%d/%d\n",  s.nomeEmpresa,s.data.dia, s.data.mes, s.data.ano);	
+					printf(" Setor: %s\n", s.setorEmpresa);
+					printf(" Solicitante: %s\n", s.nomeSolicitante);
+					switch(s.situacao)
+					{
+						case 'A': 	printf(" Cod: %d       Situação: Aguardando atendimento\n", s.id);
+						break;
+						case 'E': printf(" Cod: %d       Situação: Em atendimento\n", s.id);
+						break;
+					}
 			
-				printf(" Problema: %s\n\n", s.problema);
-				printf(" ------------------------------------------------\n\n");
-				i++;
+					printf(" Problema: %s\n\n", s.problema);
+					printf(" ------------------------------------------------\n\n");
+					i++;
+				}
 			}
+			if(i == 0) printf(" Não há solicitações em andamento!\n\n");
+			removerBloqueio();
+		}else{
+			printf(" Arquivo em uso no momento. Aguarde 1 minuto :)\n\n");
 		}
-		if(i == 0) printf(" Não há solicitações em andamento!\n\n");
-		fclose(file);
+		fclose(file);	
 	}else{
 		printf(" Arquivo indisponível :(\n\n");
 	}
@@ -160,27 +173,34 @@ void solicitacoesFinalizadas()
 	
 	if(file != NULL)
 	{
-		printf(" Empresa: ");
-		scanf(" %[^\n]s", nomeEmpresa);	
-		converte_maisculo(nomeEmpresa);
-		printf("\n");
-		while(fread(&s,sizeof(Solicitacao),1, file) == 1)
-		{
-			if(strcmp(s.nomeEmpresa, nomeEmpresa) == 0 && s.situacao == 'F')
+		if(criarBloqueio()){
+			printf(" Empresa: ");
+			scanf(" %[^\n]s", nomeEmpresa);	
+			converte_maisculo(nomeEmpresa);
+			printf("\n");
+			while(fread(&s,sizeof(Solicitacao),1, file) == 1)
 			{
-				printf(" Empresa: %s              Em: %d/%d/%d\n",  s.nomeEmpresa,s.data.dia, s.data.mes, s.data.ano);	
-				printf(" Setor: %s\n", s.setorEmpresa);
-				printf(" Solicitante: %s\n", s.nomeSolicitante);
-				printf(" Contato: %s\n", s.contato);
-				printf(" Email: %s\n", s.email);
-				printf(" Cod: %d       Situação: Problema resolvido\n", s.id);
-				printf(" Problema: %s\n", s.problema);
-				printf(" Solução aplicada: %s\n\n", s.solucao);
-				printf(" ------------------------------------------------\n\n");
-				i++;
+				if(strcmp(s.nomeEmpresa, nomeEmpresa) == 0 && s.situacao == 'F')
+				{
+					printf(" Empresa: %s              Em: %d/%d/%d\n",  s.nomeEmpresa,s.data.dia, s.data.mes, s.data.ano);	
+					printf(" Setor: %s\n", s.setorEmpresa);
+					printf(" Solicitante: %s\n", s.nomeSolicitante);
+					printf(" Contato: %s\n", s.contato);
+					printf(" Email: %s\n", s.email);
+					printf(" Cod: %d       Situação: Problema resolvido\n", s.id);
+					printf(" Problema: %s\n", s.problema);
+					printf(" Solução aplicada: %s\n\n", s.solucao);
+					printf(" ------------------------------------------------\n\n");
+					i++;
+				}
 			}
+	
+			if(i == 0) printf(" Não há solicitações finalizadas!\n\n");
+			removerBloqueio();
+		}else{
+			printf(" Arquivo em uso no momento. Aguarde 1 minuto :)\n\n");
 		}
-		if(i == 0) printf(" Não há solicitações finalizadas!\n\n");
+		fclose(file);
 	}else{
 		printf(" Arquivo indisponível :(\n\n");
 	}

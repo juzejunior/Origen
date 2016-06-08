@@ -15,5 +15,6 @@ void resolverPendente(int codigo_funcionario);
 void finalizacaoDoProblema(int id);
 void insertSortData(Solicitacao *s, int n);
 void trocarSolicitacao();
+void exibirSolucionadas();
 
 #endif

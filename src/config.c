@@ -47,6 +47,38 @@ char* now()
 	return asctime(localtime(&t));
 }
 
+int criarBloqueio()
+{
+	FILE *file_block = fopen("../block.txt","r");
+	
+	/*se o arquivo de solicitação estiver liberado para uso*/
+	if(file_block == NULL) {
+		file_block = fopen("../block.txt","w");
+		return 1;
+	}
+		
+	return 0;
+}
+
+int removerBloqueio()
+{
+	FILE *file_block = fopen("../block.txt","r");
+	
+	if(file_block != NULL){
+		remove("../block.txt");
+		return 1;
+	}
+
+	return 0;
+}
+
+void pause()
+{
+	if(checkSO())
+		system("pause");
+	else
+		system("read -p \"	Pressione <ENTER> para continuar\" saindo");
+}
 
 
 
